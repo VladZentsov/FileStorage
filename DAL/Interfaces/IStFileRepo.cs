@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DAL.Interfaces
 {
-    public interface IUserStorageRepo: IRepository<UserStorage>
+    public interface IStFileRepo : IRepository<StFile>
     {
-        public Task<UserStorage> FindByProfileIdAndName(string profileId, string name);
+        public IEnumerable<StFile> GetAllFilesByStorage(string storageId);
     }
 }

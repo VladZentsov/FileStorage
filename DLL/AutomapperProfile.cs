@@ -45,7 +45,6 @@ namespace BLL
                 .ReverseMap();
 
             CreateMap<(UserProfile, SysIdentityUser), UserGeneralInfo>()
-                .ForMember(p => p.Id, c => c.MapFrom(model => model.Item1.Id))
                 .ForMember(p => p.Name, c => c.MapFrom(model => model.Item1.Name))
                 .ForMember(p => p.Surname, c => c.MapFrom(model => model.Item1.Surname))
                 .ForMember(p => p.CreatedDate, c => c.MapFrom(model => model.Item1.CreatedDate))

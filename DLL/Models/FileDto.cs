@@ -9,8 +9,8 @@ namespace BLL.Models
     public class FileDto: BaseDto
     {
         public bool IsPublic { get; set; }
-        public string Path { get; set; }
-        public int UserId { get; set; }
-        public string UserName { get; set; }
+        public string Name { get; set; }
+        public int Weight { get; set; }
+
     }
 }

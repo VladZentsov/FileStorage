@@ -13,16 +13,11 @@ namespace FileStorage.Controllers
     {
         private readonly IAuthenticateService _authenticateService;
         private readonly IUserService _userService;
-        private readonly JsonSerializerSettings _jsonSettings;
 
         public AuthenticateController(IAuthenticateService authenticateService, IUserService userService)
         {
             _authenticateService = authenticateService;
             _userService = userService;
-            _jsonSettings = new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            };
         }
 
         [HttpPost]
@@ -41,9 +36,9 @@ namespace FileStorage.Controllers
         {
             bookModel.Role = "Admin";
             await _authenticateService.RegisterAsync(bookModel);
-            return Content(JsonConvert.SerializeObject(bookModel, _jsonSettings));
+            return Content(JsonConvert.SerializeObject(bookModel));
         }
-        //ee
+
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)

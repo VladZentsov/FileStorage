@@ -10,6 +10,6 @@ namespace DAL.Entities
     {
         public string StorageId { get; set; }
         public string UserProfileId { get; set; }
-        public UserStorage UserStorage { get; set; }
+        public UserStorage? UserStorage { get; set; }
     }
 }

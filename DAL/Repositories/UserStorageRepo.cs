@@ -1,6 +1,7 @@
 ﻿using DAL.Entities;
 using DAL.FileDBContext;
 using DAL.Interfaces;
+using DAL.RelatedDataLoader;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -13,13 +14,15 @@ namespace DAL.Repositories
     public class UserStorageRepo : IUserStorageRepo
     {
         private readonly IStorageDbContext _dbContext;
+        private readonly IRelatedDataLoader _relatedDataLoader;
         private readonly DbSet<UserStorage> _userStorage;
         private readonly DbSet<StFile> _stFiles;
-        public UserStorageRepo(IStorageDbContext dbContext)
+        public UserStorageRepo(IStorageDbContext dbContext, IRelatedDataLoader relatedDataLoader)
         {
             _dbContext = dbContext;
             _userStorage = dbContext.Set<UserStorage>();
             _stFiles = dbContext.Set<StFile>();
+            _relatedDataLoader = relatedDataLoader;
 
         }
         public Task AddAsync(UserStorage entity)
@@ -28,6 +31,27 @@ namespace DAL.Repositories
             _dbContext.SaveChanges();
 
             return Task.CompletedTask;
+        }
+
+        public async Task AddFileAsync(StFile file, string storageId)
+        {
+            var storage = await GetByIdAsync(storageId);
+
+            if (storage.Files == null)
+            {
+                storage.Files = new List<StFile>() { file };
+            }
+           else if (!storage.Files.Contains(file))
+            {
+                storage.Files.Add(file);
+            }
+            else
+            {
+                return;
+            }
+            
+            Update(storage);           
+
         }
 
         public void Delete(UserStorage entity)
@@ -43,6 +67,11 @@ namespace DAL.Repositories
         public async Task DeleteByIdAsync(string id)
         {
             Delete(await GetByIdAsync(id));
+        }
+
+        public async Task<UserStorage> FindByProfileIdAndName(string profileId, string name)
+        {
+            return await _userStorage.FirstOrDefaultAsync(st=>st.Name == name&&st.UserProfileId == profileId);
         }
 
         public IEnumerable<UserStorage> FindAll()
@@ -69,5 +98,6 @@ namespace DAL.Repositories
             _userStorage.Update(entity);
             _dbContext.SaveChanges();
         }
+
     }
 }

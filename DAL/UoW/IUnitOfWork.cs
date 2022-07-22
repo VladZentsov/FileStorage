@@ -11,5 +11,7 @@ namespace DAL.UoW
     {
         IUserIdentityRepo UserIdentityRepo { get; }
         IUserProfileRepo UserProfileRepo { get; }
+        IUserStorageRepo UserStorageRepo { get; }
+        IStFileRepo StFileRepo { get; }
     }
 }

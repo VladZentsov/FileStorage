@@ -20,7 +20,9 @@ namespace DAL.UoW
         private readonly UserManager<SysIdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private IUserProfileRepo _userProfileRepo;
+        private IUserStorageRepo _userStorageRepo; 
         private IRelatedDataLoader _relatedDataLoader;
+        private IStFileRepo _stFileRepo;
 
         public UnitOfWork(IStorageDbContext sysDbContext, UserManager<SysIdentityUser> userManager, RoleManager<IdentityRole> roleManager, IRelatedDataLoader relatedDataLoader)
         {
@@ -50,6 +52,29 @@ namespace DAL.UoW
                     _userProfileRepo = new UserProfileRepo(_sysDbContext, _relatedDataLoader);
                 }
                 return _userProfileRepo;
+            }
+        }
+        public IUserStorageRepo UserStorageRepo
+        {
+            get
+            {
+                if (_userStorageRepo == null)
+                {
+                    _userStorageRepo = new UserStorageRepo(_sysDbContext, _relatedDataLoader);
+                }
+                return _userStorageRepo;
+            }
+        }
+
+        public IStFileRepo StFileRepo
+        {
+            get
+            {
+                if (_stFileRepo == null)
+                {
+                    _stFileRepo = new StFileRepo(_sysDbContext, _relatedDataLoader);
+                }
+                return _stFileRepo;
             }
         }
     }

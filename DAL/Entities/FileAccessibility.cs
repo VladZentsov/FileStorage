@@ -10,7 +10,7 @@ namespace DAL.Entities
     {
         public string UserProfileId { get; set; }
         public string FileId { get; set; }
-        public StFile File { get; set; }
+        public StFile? File { get; set; }
 
     }
 }

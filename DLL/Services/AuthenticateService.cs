@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Services
 {
-    public class AuthenticateService: IAuthenticateService
+    public class AuthenticateService : IAuthenticateService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;

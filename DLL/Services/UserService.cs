@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BLL.Services
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -33,13 +33,13 @@ namespace BLL.Services
         {
             var userProfile = await GetUserProfileByUserName(userName);
 
-            if(model.Name!=null&&model.Name!="")
+            if (model.Name != null && model.Name != "")
                 userProfile.Name = model.Name;
 
             if (model.Surname != null && model.Surname != "")
                 userProfile.Surname = model.Surname;
 
-            if(model.Description!=null&& model.Description!="")
+            if (model.Description != null && model.Description != "")
                 userProfile.Description = model.Description;
 
             _unitOfWork.UserProfileRepo.Update(userProfile);
@@ -55,32 +55,13 @@ namespace BLL.Services
 
         public IEnumerable<UserProfileDto> GetAll()
         {
-            var userProfiles = _unitOfWork.UserProfileRepo.FindAll();
-
-            var userProfilesDto = _mapper.Map<IEnumerable<UserProfile>, IEnumerable<UserProfileDto>>(_unitOfWork.UserProfileRepo.FindAll());
-
-            for (int i = 0; i < userProfiles.Count(); i++)
-            {
-                IEnumerable<StFile> StorageFiles = new List<StFile>();
-
-                foreach (var userStorage in userProfiles.ElementAt(i).AccessibleStorages.Select(s => s.UserStorage))
-                {
-                    StorageFiles.Concat(userStorage.Files);
-                }
-
-                IEnumerable<StFile> files = (userProfiles.ElementAt(i).AccessibleFiles.Select(af => af.File))
-                    .Concat(StorageFiles);
-
-                userProfilesDto.ElementAt(i).Files =(_mapper.Map<ICollection<StFile>, ICollection<FileDto>>((ICollection<StFile>)files));
-            }
-
-            return userProfilesDto;
+            return _mapper.Map<IEnumerable<UserProfile>, IEnumerable<UserProfileDto>>(_unitOfWork.UserProfileRepo.FindAll());
         }
 
         public async Task<UserProfileDto> GetByIdAsync(string id)
         {
-            return _mapper.Map<UserProfile, UserProfileDto>(await _unitOfWork.UserProfileRepo.GetByIdWithDetailsAsync(id));
-        } 
+            return _mapper.Map<UserProfile, UserProfileDto>(await _unitOfWork.UserProfileRepo.GetByIdAsync(id));
+        }
 
         public async Task<UserGeneralInfo> GetUserGeneralInfoByUserName(string userName)
         {
@@ -88,7 +69,7 @@ namespace BLL.Services
             var userProfile = await _unitOfWork.UserProfileRepo.GetByIdAsync(sysIdentityUser.ProfileId);
 
             var result = _mapper.Map<(UserProfile, SysIdentityUser), UserGeneralInfo>((userProfile, sysIdentityUser));
-            result.Role=await _unitOfWork.UserIdentityRepo.GetRoleByUserId(sysIdentityUser.Id);
+            result.Role = await _unitOfWork.UserIdentityRepo.GetRoleByUserId(sysIdentityUser.Id);
 
             return result;
         }
@@ -102,7 +83,7 @@ namespace BLL.Services
 
             foreach (var userIdentity in allUsersIdentities)
             {
-                var userProfile = await _unitOfWork.UserProfileRepo.GetByIdWithDetailsAsync(userIdentity.ProfileId);
+                var userProfile = await _unitOfWork.UserProfileRepo.GetByIdAsync(userIdentity.ProfileId);
 
                 var User = _mapper.Map<(UserProfile, SysIdentityUser), UserGeneralInfo>((userProfile, userIdentity));
                 User.Role = await _unitOfWork.UserIdentityRepo.GetRoleByUserId(userIdentity.Id);
@@ -116,10 +97,7 @@ namespace BLL.Services
         public async Task<IEnumerable<UserBriefInfo>> GetAllUsersBriefInfo(string role)
         {
             var allUsers = await GetUsersByRole(role);
-
-            var allUserBriefInfos = _mapper.Map<IEnumerable<UserGeneralInfo>, IEnumerable<UserBriefInfo>>(allUsers);
-
-            return allUserBriefInfos;
+            return _mapper.Map<IEnumerable<UserGeneralInfo>, IEnumerable<UserBriefInfo>>(allUsers);
         }
 
 
@@ -134,7 +112,6 @@ namespace BLL.Services
         {
             _unitOfWork.UserProfileRepo.Update(_mapper.Map<UserProfileDto, UserProfile>(model));
             return Task.CompletedTask;
-
         }
     }
 }

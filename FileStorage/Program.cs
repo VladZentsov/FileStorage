@@ -15,6 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -27,9 +29,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var connectionStringSysDb = builder.Configuration.GetConnectionString("FileStorageDb");
+//var connectionStringSysIdentityDb = builder.Configuration.GetConnectionString("SysIdentityDb");
+
+//builder.Services.AddDbContext<SysDbContext>(options=>options.UseSqlServer(connectionStringSysDb, b=>b.MigrationsAssembly("DAL")));
 
 builder.Services.AddScoped<IUserProfileRepo, UserProfileRepo>();
 builder.Services.AddScoped<IUserIdentityRepo, UserIdentityRepo>();
+builder.Services.AddScoped<IStFileRepo, StFileRepo>();
+
+builder.Services.AddScoped<IUploadFileService, UploadFileService>();
 
 builder.Services.AddIdentity<SysIdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<StorageDbContext>()
@@ -38,10 +46,10 @@ builder.Services.AddIdentity<SysIdentityUser, IdentityRole>()
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+builder.Services.AddScoped<IRelatedDataLoader, RelatedDataLoader>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
-
-builder.Services.AddScoped<IRelatedDataLoader, RelatedDataLoader>();
 
 builder.Services.AddDbContext<IStorageDbContext, StorageDbContext>(options =>
            options.UseSqlServer(connectionStringSysDb));
@@ -54,6 +62,7 @@ builder.Services.AddSingleton(provider => new MapperConfiguration(cfg =>
 
 }).CreateMapper());
 
+// Adding Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -61,20 +70,28 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 
+
 // Adding Jwt Bearer
 .AddJwtBearer(options =>
- {
-     options.SaveToken = true;
-     options.RequireHttpsMetadata = false;
-     options.TokenValidationParameters = new TokenValidationParameters()
-     {
-         ValidateIssuer = true,
-         ValidateAudience = true,
-         ValidAudience = configuration["JWT:ValidAudience"],
-         ValidIssuer = configuration["JWT:ValidIssuer"],
-         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
-     };
- });
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = configuration["JWT:ValidAudience"],
+        ValidIssuer = configuration["JWT:ValidIssuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
+    };
+});
+
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
+}); 
 
 
 // Add services to the container.
@@ -122,6 +139,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -133,6 +151,8 @@ app.UseHttpsRedirection();
 
 app.UseCors("EnableCORS");
 
+// Authentication & Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

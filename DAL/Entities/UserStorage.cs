@@ -8,8 +8,9 @@ namespace DAL.Entities
 {
     public class UserStorage:BaseEntity
     {
+        public string Name { get; set; }
         public string UserProfileId { get; set; }
-        public UserProfile UserProfile { get; set; }
+        public UserProfile? UserProfile { get; set; }
         public ICollection<StFile>? Files { get; set; }
     }
 }
