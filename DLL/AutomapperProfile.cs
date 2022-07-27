@@ -36,6 +36,9 @@ namespace BLL
             CreateMap<RegisterModel, UserProfile>()
                 .ReverseMap();
 
+            CreateMap<StFile, FileDto>()
+                .ReverseMap();
+
             CreateMap<(RegisterModel,string), UserProfile>()
                 .ForMember(p => p.Id, c => c.MapFrom(model => model.Item1.Id))
                 .ForMember(p => p.Name, c => c.MapFrom(model => model.Item1.Name))

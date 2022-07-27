@@ -47,12 +47,14 @@ namespace DAL.FileDBContext
             builder
                .HasMany(x => x.AccessibleStorages)
                .WithOne()
-               .HasForeignKey(x=>x.UserProfileId);
+               .HasForeignKey(x=>x.UserProfileId)
+               .OnDelete(DeleteBehavior.Restrict);
 
             builder
                .HasMany(x => x.AccessibleFiles)
                .WithOne()
-               .HasForeignKey(x => x.UserProfileId);
+               .HasForeignKey(x => x.UserProfileId)
+               .OnDelete(DeleteBehavior.Restrict);
 
             //builder
             //   .HasOne(x => x.AccessibleFile)

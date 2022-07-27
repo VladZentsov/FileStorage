@@ -12,5 +12,6 @@ namespace BLL.Interfaces
     {
         public Task UploadFile(IFormFile file, string storageName, string userName, bool IsPublic);
         public Task<List<UserStorageDto>> GetUserStoragesAsync(string userName);
+        public Task<(MemoryStream, string, string)> Download(string userName, string storage, string fileName);
     }
 }

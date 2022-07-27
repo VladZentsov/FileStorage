@@ -44,7 +44,7 @@ namespace DAL.Repositories
 
         public IEnumerable<StFile> FindAll()
         {
-            throw new NotImplementedException();
+            return _stFiles;
         }
 
         public Task<StFile> GetByIdAsync(string id)

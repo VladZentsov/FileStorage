@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DAL.Migrations
 {
-    public partial class FileStorageDb : Migration
+    public partial class DBM1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -54,6 +54,7 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserProfileId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -201,10 +202,10 @@ namespace DAL.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     IsPublic = table.Column<bool>(type: "bit", nullable: false),
-                    Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserStorageId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Weight = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserStorageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -219,7 +220,8 @@ namespace DAL.Migrations
                         name: "FK_StFile_UserStorage_UserStorageId",
                         column: x => x.UserStorageId,
                         principalTable: "UserStorage",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -228,7 +230,7 @@ namespace DAL.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     StorageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -237,7 +239,8 @@ namespace DAL.Migrations
                         name: "FK_StorageAccessibility_UserProfiles_UserProfileId",
                         column: x => x.UserProfileId,
                         principalTable: "UserProfiles",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_StorageAccessibility_UserStorage_StorageId",
                         column: x => x.StorageId,
@@ -251,8 +254,8 @@ namespace DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    UserProfileId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FileId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -267,7 +270,8 @@ namespace DAL.Migrations
                         name: "FK_FileAccessibility_UserProfiles_UserProfileId",
                         column: x => x.UserProfileId,
                         principalTable: "UserProfiles",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(

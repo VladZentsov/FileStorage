@@ -1,6 +1,7 @@
 ﻿using BLL.Interfaces;
 using BLL.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -29,7 +30,7 @@ namespace FileStorage.Controllers
 
         [HttpGet]
         [Route("GetUserStorages")]
-        public async Task<ActionResult<UserStorageDto>> GetUserStorages()
+        public async Task<ActionResult<List<UserStorageDto>>> GetUserStorages()
         {
             var userName = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value;
 
@@ -59,5 +60,23 @@ namespace FileStorage.Controllers
                 return BadRequest(ex);
             }
         }
+
+        [HttpGet, DisableRequestSizeLimit]
+        [Route("Download")]
+        public async Task<IActionResult> Download([FromQuery] string fileUrl)
+        {
+
+            var d = Request.QueryString;
+            var userName = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value;
+
+            string storage = fileUrl.Split('/')[0];
+            string fileName = fileUrl.Split('/')[1];
+
+            var fileResult = await _uploadFileService.Download(userName, storage, fileName);
+
+            return File(fileResult.Item1, fileResult.Item2, fileResult.Item3);
+        }
+
+        
     }
 }
